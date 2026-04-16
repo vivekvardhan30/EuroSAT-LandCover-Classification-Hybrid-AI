@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>EuroSAT Land Use Classification</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="fade-in">🌍 EuroSAT Land Use Classification</h1>
+      <p class="subtitle">
+        Upload an image to see predictions from <b>Custom CNN</b>, <b>VGG16</b>,
+        and <b>Random Forest</b>.
+      </p>
+
+      <!-- Upload Form -->
+      <form method="post" enctype="multipart/form-data" class="upload-box slide-up">
+        <input type="file" name="file" accept="image/*" required />
+        <button type="submit">🔍 Predict</button>
+      </form>
+
+      <!-- Results -->
+      {% if file_path %}
+      <div class="results fade-in">
+        <h2>📸 Uploaded Image</h2>
+        <img src="{{ file_path }}" class="preview" alt="Uploaded Image" />
+
+        <div class="predictions">
+          <div class="card zoom-in">
+            <h3>🧠 Custom CNN</h3>
+            <p><b>Prediction:</b> {{ custom_pred }}</p>
+            <p><b>Confidence:</b> {{ custom_conf }}%</p>
+          </div>
+
+          <div class="card zoom-in">
+            <h3>🔗 VGG16</h3>
+            <p><b>Prediction:</b> {{ vgg_pred }}</p>
+            <p><b>Confidence:</b> {{ vgg_conf }}%</p>
+          </div>
+
+          <div class="card zoom-in">
+            <h3>🌲 Random Forest</h3>
+            <p><b>Prediction:</b> {{ rf_pred }}</p>
+            <p><b>Confidence:</b> {{ rf_conf }}%</p>
+          </div>
+        </div>
+
+        <!-- Probability Chart -->
+        <div class="charts fade-in">
+          <h2>📊 Prediction Probabilities</h2>
+          <canvas id="probChart"></canvas>
+        </div>
+
+        <!-- Model Comparison Chart -->
+        <div class="charts fade-in">
+          <h2>⚡ Model Confidence Comparison</h2>
+          <canvas id="modelCompareChart"></canvas>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    
+    {% if file_path %}
+    <!-- Hidden JSON data block -->
+    <script id="chart-data" type="application/json">
+        {
+            "classNames": {{ class_names|tojson }},
+            "probsCustom": {{ probs_custom|tojson }},
+            "probsVGG": {{ probs_vgg|tojson }},
+            "probsRF": {{ probs_rf|tojson }},
+            "cnnConf": {{ custom_conf|tojson }},
+            "vggConf": {{ vgg_conf|tojson }},
+            "rfConf": {{ rf_conf|tojson }}
+        }
+    </script>
+
+    <!-- Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Our custom chart logic -->
+    <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+    {% endif %}
+
+
+  </body>
+</html>
